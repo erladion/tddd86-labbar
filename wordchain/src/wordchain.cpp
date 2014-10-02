@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Labb 2a - Wordchain
  *
  * Namn:    Johan Jansson
@@ -111,3 +112,26 @@ int main() {
 
     return 0;
 }
+=======
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <queue>
+#include <stack>
+using namespace std;
+
+const string alphabet  = "abcdefghijklmnopqrstuvwxyz";
+
+int main() {
+    cout << "Welcome to TDDD86 Word Chain." << endl;
+    cout << "If you give me two English words, I will transform the" << endl;
+    cout << "first into the second by changing one letter at a time." << endl;
+    cout << endl;
+
+    cout << "Please type two words: ";
+
+    // TODO: Finish the program!
+
+    return 0;
+}
+>>>>>>> 078604445e0f2bde06ef1be5cf656c176c112971
