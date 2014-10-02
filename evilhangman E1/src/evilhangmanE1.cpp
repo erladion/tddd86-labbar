@@ -75,10 +75,9 @@ queue<string> longestList(unordered_map<int,queue<string> > listOfLists){
 /*
  * Tar in en lista med alla ord som finns kvar att välja från och en gissning.
  * Den delar upp ordlistan i olika listor beroende på var gissningen fanns i ordet.
- * Sedan returnerar den den längsta av de listorna.*
- *
+ * Sedan returnerar den den längsta av de listorna.
  */
-queue<string> bestWordlist(queue<string>& wordlist, char& guess){
+queue<string> bestWordlist(queue<string>& wordlist, char& guess, int guessesLeft){
     unordered_map<int,queue<string> > possibleWordGroups;
     while (!wordlist.empty()){
         string word = wordlist.front();
@@ -90,6 +89,8 @@ queue<string> bestWordlist(queue<string>& wordlist, char& guess){
         }
         possibleWordGroups[letterCode].push(word);
     }
+    if (guessesLeft == 1 && possibleWordGroups.find(0) != possibleWordGroups.end())
+        return possibleWordGroups[0];
     return longestList(possibleWordGroups);
 }
 
@@ -186,7 +187,7 @@ int main() {
             }
             guessedLetters.insert(guessedChar);
 
-            usableWords = bestWordlist(usableWords,guessedChar);
+            usableWords = bestWordlist(usableWords,guessedChar, numberOfGuesses);
 
             if (!correctGuess(usableWords.front(),guessedChar))
                 numberOfGuesses--;
