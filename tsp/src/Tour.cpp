@@ -9,6 +9,7 @@
 #include "Node.h"
 #include "Point.h"
 #include <limits>
+#include <string>
 
 Tour::Tour()
 {
@@ -111,8 +112,8 @@ void Tour::insertSmallest(Point p)
     Node* current = firstNode;
     do {
         double difference = (current->point.distanceTo(p)+
-                            p.distanceTo(current->next->point))-
-                            current->point.distanceTo(current->next->point);
+                             p.distanceTo(current->next->point))-
+                current->point.distanceTo(current->next->point);
         if (difference < shortestDifference){
             shortestDifference = difference;
             bestNode = current;
@@ -125,26 +126,41 @@ void Tour::insertSmallest(Point p)
 
 void Tour::untangle(){
     Node* current = firstNode;
+    Node* p = current;
+    Node* q = current->next;
+    bool hasChanged;
     do {
-        Point p = current->point;
-        Point q = current->next->point;
-        Node* current2 = current->next->next;
+        hasChanged = false;
         do {
-            Point s = current2->point;
-            Point t = current2->next->point;
+            p = current;
+            q = current->next;
+            Node* current2 = current->next;
+            Node* s = current2->next;
+            Node* t = current2->next->next;
+            do {
+                Node* prevS = current2;
+                s = current2->next;
+                t = current2->next->next;
 
-            double side1 = (p.x-q.x)*(s.y-p.y) - (p.y-q.y)*(s.x-p.x);
-            double side2 = (p.x-q.x)*(t.y-p.y) - (p.y-q.y)*(t.x-p.x);
-            if ((side1 < 0 && side2 > 0) || side1 > 0 && side2 < 0 ){
-                //TODO: Sätta ihop punkterna på ett nytt sätt
-            }
+                double side1 = (p->point.x-q->point.x)*(s->point.y-p->point.y) - (p->point.y-q->point.y)*(s->point.x-p->point.x);
+                double side2 = (p->point.x-q->point.x)*(t->point.y-p->point.y) - (p->point.y-q->point.y)*(t->point.x-p->point.x);
+                if ((side1 < 0 && side2 > 0) || side1 > 0 && side2 < 0 ){
+                    hasChanged = true;
+                    p->next = s;
+                    if (prevS == q)
+                        s->next = q;
+                    else{
+                        prevS->next = q;
+                        s->next = q->next;
+                    }
+                    q->next = t;
+                    show();
+                    break;
 
-
-
-            current2 = current2->next;
-        } while (current2 != firstNode);
-
-
-        current = current->next;
-    } while (current != firstNode);
+                }
+                current2 = current2->next;
+            } while (t != p);
+            current = current->next;
+        } while (q->next->next != firstNode);
+    } while (hasChanged);
 }

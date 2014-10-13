@@ -22,6 +22,7 @@ public:
     double distance();
     void insertNearest(Point p);
     void insertSmallest(Point p);
+    void untangle();
 
 private:
     Node* firstNode;
