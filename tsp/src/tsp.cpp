@@ -18,7 +18,7 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    string filename = "tsp5.txt";
+    string filename = "circuit1290.txt";
     ifstream input;
     input.open(filename);
 
@@ -45,12 +45,13 @@ int main(int argc, char *argv[]) {
         tour.insertNearest(p);
         //uncomment the 4 lines below to animate
         tour.draw(scene);
-        std::chrono::milliseconds dura(1000);
+        std::chrono::milliseconds dura(0);
         std::this_thread::sleep_for(dura);
         a.processEvents();
     }
     input.close();
-    std::chrono::milliseconds dura(5000);
+    tour.draw(scene);
+    std::chrono::milliseconds dura(1000);
     std::this_thread::sleep_for(dura);
     tour.untangle();
     tour.draw(scene);

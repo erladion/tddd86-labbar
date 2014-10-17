@@ -128,8 +128,8 @@ void Tour::untangle(){
     Node* current = firstNode;
     Node* p = current;
     Node* q = current->next;
-    bool hasChanged;
-    do {
+    bool hasChanged = true;
+    while(hasChanged) {
         hasChanged = false;
         do {
             p = current;
@@ -144,23 +144,33 @@ void Tour::untangle(){
 
                 double side1 = (p->point.x-q->point.x)*(s->point.y-p->point.y) - (p->point.y-q->point.y)*(s->point.x-p->point.x);
                 double side2 = (p->point.x-q->point.x)*(t->point.y-p->point.y) - (p->point.y-q->point.y)*(t->point.x-p->point.x);
-                if ((side1 < 0 && side2 > 0) || side1 > 0 && side2 < 0 ){
-                    hasChanged = true;
-                    p->next = s;
-                    if (prevS == q)
-                        s->next = q;
-                    else{
-                        prevS->next = q;
-                        s->next = q->next;
+                if ((side1 <= 0 && side2 > 0) || (side1 >= 0 && side2 < 0)){
+                    double side3 = (s->point.x-t->point.x)*(p->point.y-s->point.y) - (s->point.y-t->point.y)*(p->point.x-s->point.x);
+                    double side4 = (s->point.x-t->point.x)*(q->point.y-s->point.y) - (s->point.y-t->point.y)*(q->point.x-s->point.x);
+                    if ((side3 <= 0 && side4 > 0) || (side3 >= 0 && side4 < 0)){
+                        hasChanged = true;
+                        Node* currentPoint = q;
+                        Node* nextPoint = q->next;
+                        Node* yetAnotherPoint = nextPoint->next;
+                        while (nextPoint != s){
+                            nextPoint->next = currentPoint;
+                            currentPoint = nextPoint;
+                            nextPoint = yetAnotherPoint;
+                            yetAnotherPoint = yetAnotherPoint->next;
+                        }
+                        p->next = s;
+                        if (prevS == q)
+                            s->next = q;
+                        else{
+                            s->next = prevS;
+                        }
+                        q->next = t;
+                        break;
                     }
-                    q->next = t;
-                    show();
-                    break;
-
                 }
                 current2 = current2->next;
             } while (t != p);
             current = current->next;
         } while (q->next->next != firstNode);
-    } while (hasChanged);
+    }
 }
