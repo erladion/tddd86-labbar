@@ -14,6 +14,15 @@ public:
 
 private:
     OurBoard gameBoard;
+    vector<location> opponentsMovement;
+    int ammoLeft;
+    int minesLeft;
+
+    int previousRoundScore;
+    int currentScore;
+
+    action fireAtOpp(const sensors&) override;
+
 };
 
 #endif // JOHJA118_FILMA035_H

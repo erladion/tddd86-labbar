@@ -15,6 +15,7 @@
 #include "setups.h"
 #include "player.h"			// for human players
 #include "garlick.h"
+#include "johja118_filma035.h"
 
 using namespace std;
 
@@ -25,7 +26,7 @@ using namespace std;
 
 typedef garlick aplayer1;		// use typedef human1 aplayer1; for human player 1
 								// otherwise   typedef your_class aplayer1; for your class
-typedef player aplayer2;		// use typedef human2 aplayer2; for human player 2
+typedef johja118_filma035 aplayer2;		// use typedef human2 aplayer2; for human player 2
 								// otherwise   typedef oppon_class aplayer2; for opponent class
 
 /***************************************************************

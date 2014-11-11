@@ -5,11 +5,9 @@ CONFIG += console
 CONFIG += no_include_pwd
 
 SOURCES = $$PWD/src/*.cpp \
-    src/johja118_filma035.cpp \
-    src/ourboard.cpp
+
 HEADERS = $$PWD/src/*.h \
-    src/johja118_filma035.h \
-    src/ourboard.h
+
 
 QMAKE_CXXFLAGS += -std=c++11
 
