@@ -37,7 +37,7 @@ void readDictionary(unordered_multimap<int,string>& dictionary){
  * Skriver ut en queue till konsolen
  */
 void printQueue(queue<string>& q){
-    for (int i = 0;i < q.size();++i){
+    for (size_t i = 0;i < q.size();++i){
         cout << q.front() << endl;
         q.push(q.front());
         q.pop();
@@ -46,11 +46,12 @@ void printQueue(queue<string>& q){
 
 /*
  * Tar in ett ord samt en bokstav och kollar ifall bokstaven finns i ordet
- * och returnerar en sträng med 1:or och 0:or där 1:or betyder att bokstaven fanns på den positionen
+ * och gör ett binärt tal där 1 representerar om den finns på den positionen, 0 annars.
+ * Returnerar talet i decimalform.
  */
 int findLetter(string& word, char& letter){
     int res = 0;
-    for (int i = 0; i < word.length(); ++i){
+    for (size_t i = 0; i < word.length(); ++i){
         if (letter == word[i]) res += pow(2,i);
     }
     return res;
@@ -63,9 +64,9 @@ queue<string> longestList(unordered_map<int,queue<string> > listOfLists){
     queue<string> bestList;
     int length = 0;
     for (auto it = listOfLists.begin(); it != listOfLists.end();++it){
-        if ((*it).second.size() > length){
-            length = (*it).second.size();
-            bestList = (*it).second;
+        if (it->second.size() > length){
+            length = it->second.size();
+            bestList = it->second;
         }
     }
     cout << endl;
@@ -82,14 +83,14 @@ queue<string> bestWordlist(queue<string>& wordlist, char& guess, int guessesLeft
     while (!wordlist.empty()){
         string word = wordlist.front();
         wordlist.pop();
-        int letterCode = findLetter(word, guess);
-        if (possibleWordGroups.find(letterCode) == possibleWordGroups.end()){
+        int letterCode = findLetter(word, guess); // lettercode är unikt för varje ordgrupp
+        if (possibleWordGroups.find(letterCode) == possibleWordGroups.end()){ // kollar om ordgruppen inte finns, annars skapas en ny lista som hör till den nya ordgruppen.
             queue<string> wordGroup;
             possibleWordGroups[letterCode] = wordGroup;
         }
         possibleWordGroups[letterCode].push(word);
     }
-    if (guessesLeft == 1 && possibleWordGroups.find(0) != possibleWordGroups.end())
+    if (guessesLeft == 1 && possibleWordGroups.find(0) != possibleWordGroups.end()) // Om man bara har en gissning kvar så väljer den automatiskt ordgruppen som inte innehåller några rätt om den finns.
         return possibleWordGroups[0];
     return longestList(possibleWordGroups);
 }
@@ -101,7 +102,7 @@ queue<string> bestWordlist(queue<string>& wordlist, char& guess, int guessesLeft
 void printWord(string& word, unordered_set<char>& letterList, bool& won){
     string res;
     won = true;
-    for (int i = 0; i < word.length();++i){
+    for (size_t i = 0; i < word.length();++i){
         if (letterList.find(word[i]) == letterList.end()){
             res += "-";
             won = false;
@@ -116,7 +117,7 @@ void printWord(string& word, unordered_set<char>& letterList, bool& won){
  * Kollar om gissning är rätt
  */
 bool correctGuess(string& word, char& guess){
-    for (int i = 0; i < word.length();++i){
+    for (size_t i = 0; i < word.length();++i){
         if (guess == word[i]) return true;
     }
     return false;
