@@ -1,8 +1,11 @@
-// This is the .cpp file you will edit and turn in.
-// We have provided a skeleton for you,
-// but you must finish it as described in the spec.
-// Also remove these comments here and add your own.
-// TODO: remove this comment header
+/* Labb 3 - TSP
+ *
+ * Namn:    Filip Magnusson
+ * Liuid:   filma035
+ *
+ * Namn:    Johan Jansson
+ * Liuid:   johja118
+ */
 
 #include <iostream>
 #include "Tour.h"
@@ -16,20 +19,17 @@ Tour::Tour()
     firstNode = nullptr;
 }
 
-Tour::Tour(Point& a,Point& b,Point& c,Point& d){
-    Node* nodeD = new Node(d,nullptr);
-    Node* nodeC = new Node(c,nodeD);
-    Node* nodeB = new Node(b,nodeC);
-    Node* nodeA = new Node(a,nodeB);
-
-
-    nodeD->next = nodeA;
-    firstNode = nodeA;
-}
-
 Tour::~Tour()
 {
+    if (firstNode == nullptr) return;
+    Node* currentPtr = firstNode;
 
+    while(currentPtr->next != nullptr){
+        Node* nextPtr = currentPtr->next;
+        delete currentPtr;
+        currentPtr = nextPtr;
+    }
+    delete currentPtr;
 }
 
 void Tour::show()
@@ -87,9 +87,12 @@ void Tour::insertNearest(Point p)
     double shortestDistance = std::numeric_limits<double>::infinity();
     Node* bestNode;
     Node* current = firstNode;
+    // Gå igenom alla noder
     do {
+        // Beräkna avståndet mellan nuvarande nod och punkten p
         double distance = current->point.distanceTo(p);
         if (distance < shortestDistance){
+            // Om avståndet är kortast hittills spara noden i bestNode
             shortestDistance = distance;
             bestNode = current;
         }
@@ -110,11 +113,23 @@ void Tour::insertSmallest(Point p)
     double shortestDifference = std::numeric_limits<double>::infinity();
     Node* bestNode;
     Node* current = firstNode;
+    // Gå igenom alla noder
     do {
+        // Beräkna skillnaden mellan (nuvarande punkt -> p -> nästa punkt (s1 + s2)) och (nuvarande punkt -> nästa punkt (s3))
+        /*
+         *       p
+         *      / \
+         * s1  /   \  s2
+         *    /     \
+         *  nu———————nä
+         *
+         *      s3
+         */
         double difference = (current->point.distanceTo(p)+
                              p.distanceTo(current->next->point))-
                 current->point.distanceTo(current->next->point);
         if (difference < shortestDifference){
+            // Om avståndet är kortast hittills spara noden i bestNode
             shortestDifference = difference;
             bestNode = current;
         }
@@ -129,8 +144,10 @@ void Tour::untangle(){
     Node* p = current;
     Node* q = current->next;
     bool hasChanged = true;
+    //En loop som kör tills det inte finns några korsningar mer.
     while(hasChanged) {
         hasChanged = false;
+        // En dubbel loop som går igenom alla par av linjer
         do {
             p = current;
             q = current->next;
@@ -141,17 +158,31 @@ void Tour::untangle(){
                 Node* prevS = current2;
                 s = current2->next;
                 t = current2->next->next;
-
+                // Kollar om pq och st korsar varandra
                 double side1 = (p->point.x-q->point.x)*(s->point.y-p->point.y) - (p->point.y-q->point.y)*(s->point.x-p->point.x);
                 double side2 = (p->point.x-q->point.x)*(t->point.y-p->point.y) - (p->point.y-q->point.y)*(t->point.x-p->point.x);
                 if ((side1 <= 0 && side2 > 0) || (side1 >= 0 && side2 < 0)){
                     double side3 = (s->point.x-t->point.x)*(p->point.y-s->point.y) - (s->point.y-t->point.y)*(p->point.x-s->point.x);
                     double side4 = (s->point.x-t->point.x)*(q->point.y-s->point.y) - (s->point.y-t->point.y)*(q->point.x-s->point.x);
                     if ((side3 <= 0 && side4 > 0) || (side3 >= 0 && side4 < 0)){
+                        /*
+                         * Fixar korsningen mellan pq och st på följande sätt
+                         * Väg: p>q>s>t          Ny väg: p>s>q>t
+                         *
+                         * —p     s——\           —p——————s——\
+                         *   \   /    \                      \
+                         *    \ /      \                      \
+                         *     X       |    =>                |
+                         *    / \      /                      /
+                         *   /   \    /                      /
+                         * —t     q——/           —t——————q——/
+                         *
+                         */
                         hasChanged = true;
                         Node* currentPoint = q;
                         Node* nextPoint = q->next;
                         Node* yetAnotherPoint = nextPoint->next;
+                        // Byt riktning på vägarna mellan s och q, så att det ej blir några stängda loopar
                         while (nextPoint != s){
                             nextPoint->next = currentPoint;
                             currentPoint = nextPoint;

@@ -11,6 +11,9 @@ action johja118_filma035::fireAtOpp(const sensors& s){
 
 action johja118_filma035::doYourThing (const sensors &s) {
     if(s.turn == 1){
+        matchNumber++;
+        opponentsMovement.push_back(vector<location>);
+        minePositions.push_back(vector<location>);
         /*  player = 1
          *  opponent = 2
          */
@@ -19,12 +22,13 @@ action johja118_filma035::doYourThing (const sensors &s) {
         gameBoard.setBaseAt(s.oppBase,2);
         previousRoundScore = s.myScore;
         currentScore = s.myScore;
+
     }
 
     previousRoundScore = currentScore;
     currentScore = s.myScore;
 
-    opponentsMovement.push_back(s.opp);
+    opponentsMovement[matchNumber].push_back(s.opp);
     ammoLeft = s.myAmmo;
     minesLeft = s.myMines;
 
@@ -32,6 +36,12 @@ action johja118_filma035::doYourThing (const sensors &s) {
     if(currentScore - previousRoundScore == POINTS_FOR_OBS){
         gameBoard.setObjectAt(s.opp, obs);
         oppOnObs = true;
+    }
+    if((currentScore - previousRoundScore == POINTS_FOR_MINE+POINTS_FOR_HIT) || (currentScore - previousRoundScore == POINTS_FOR_MINE && (POINTS_FOR_HIT != POINTS_FOR_MINE || lastAction != fire))){
+        minePositions[matchNumber].push_back(s.opp);
+    }
+    if(currentScore - previousRoundScore == POINTS_FOR_MINE+POINTS_FOR_HIT){
+        minePositions[matchNumber].push_back(s.opp);
     }
 
     gameBoard.setPlayerLoc(s.me,1);
@@ -72,7 +82,8 @@ action johja118_filma035::doYourThing (const sensors &s) {
 
     }
     gameBoard.setPlayerLoc(s.opp, 2);
-    return fireAtOpp(s);
+    lastAction = move;
+    return move;
 }
 
 string johja118_filma035::taunt(const string &otherguy) const{

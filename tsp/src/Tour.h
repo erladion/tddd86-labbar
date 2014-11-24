@@ -1,8 +1,11 @@
-// This is the .h file you will edit and turn in.
-// We have provided a skeleton for you,
-// but you must finish it as described in the spec.
-// Also remove these comments here and add your own, as well as on the members.
-// TODO: remove this comment header
+/* Labb 3 - TSP
+ *
+ * Namn:    Filip Magnusson
+ * Liuid:   filma035
+ *
+ * Namn:    Johan Jansson
+ * Liuid:   johja118
+ */
 
 #ifndef TOUR_H
 #define TOUR_H
@@ -12,16 +15,23 @@
 
 class Tour {
 public:
-
-    Tour();
-    Tour(Point& a, Point& b, Point& c, Point& d);
+    // Skapar en ny tom tour
+    Tour();    
+    // Tar bort touren
     ~Tour();
+    // Skriver ut alla noders koordinater
     void show();
+    // Ritar touren
     void draw(QGraphicsScene* scene);
+    // Antalet noder i touren
     int size();
+    // Räknar ut av avståndet av hela touren
     double distance();
+    // Sätter in en ny nod med insertNearest heuristiken
     void insertNearest(Point p);
+    // Sätter in en ny nod med insertSmallest heuristiken
     void insertSmallest(Point p);
+    // Tar bort alla korsningar om sådana finns
     void untangle();
 
 private:

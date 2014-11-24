@@ -18,7 +18,7 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    string filename = "circuit1290.txt";
+    string filename = "tsp1000.txt";
     ifstream input;
     input.open(filename);
 
@@ -61,13 +61,7 @@ int main(int argc, char *argv[]) {
          << std::showpoint << tour.distance() << endl;
     cout << "Number of points: " << tour.size() << endl;
 
+    //tour.show();
 
-
-
-
-    tour.show();
-
-    // draw tour
-   // tour.draw(scene);
     return a.exec(); // start Qt event loop
 }

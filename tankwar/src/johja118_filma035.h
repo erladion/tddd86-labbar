@@ -3,6 +3,7 @@
 
 #include "ourboard.h"
 #include "Tank.h"
+#include <vector>
 
 class johja118_filma035 : public Tank{
 
@@ -14,7 +15,10 @@ public:
 
 private:
     OurBoard gameBoard;
-    vector<location> opponentsMovement;
+    vector<vector<location> > opponentsMovement;
+    vector<vector<location> > minePositions;
+    action lastAction;
+    int matchNumber = 0;
     int ammoLeft;
     int minesLeft;
 
