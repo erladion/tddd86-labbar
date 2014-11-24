@@ -8,7 +8,7 @@ class OurBoard : public Board
 public:
     OurBoard();
     void setBaseAt(location loc, int playerNum);
-    void setObjectAt(location loc, status obj);
+    void setObjectAt(const location& loc, status obj);
 
 private:
     location p1b;

@@ -7,11 +7,11 @@ OurBoard::OurBoard()
             b[row][col] = nada;
         }
     }
-    for (i=0; i < BOARD_COLS; i++) {
+    for (int i=0; i < BOARD_COLS; i++) {
         b[0][i] = edge;
         b[BOARD_ROWS-1][i] = edge;
     }
-    for (i=0; i < BOARD_ROWS; i++) {
+    for (int i=0; i < BOARD_ROWS; i++) {
         b[i][0] = edge;
         b[i][BOARD_COLS-1] = edge;
     }
