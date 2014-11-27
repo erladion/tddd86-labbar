@@ -4,6 +4,10 @@
 #include "ourboard.h"
 #include "Tank.h"
 #include <vector>
+#include <deque>
+#include <math.h>
+#include <algorithm>
+
 
 class johja118_filma035 : public Tank{
 
@@ -17,11 +21,13 @@ private:
     OurBoard gameBoard;
     vector<vector<location> > opponentsMovement;
     vector<vector<action> > ownActions;
-    vector<vector<pair<location,bool> > > minePositions;
+    vector<vector<location > > minePositions;
     action lastAction;
-    int matchNumber = 0;
+    int matchNumber = -1;
     int ammoLeft;
     int minesLeft;
+
+    void locationOffset(location&, moves move);
 
     int previousRoundScore;
     int currentScore;
@@ -31,6 +37,8 @@ private:
     void updateInfo(const sensors&,int&);
 
     action baseMine(const sensors&);
+
+    deque<location> mineTargets(const sensors&);
 
     moves nearestDirection(const location& from,const location& to, int offset);
 };

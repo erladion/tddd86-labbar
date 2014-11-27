@@ -1,5 +1,4 @@
 #include "johja118_filma035.h"
-#include <math.h>
 
 johja118_filma035::johja118_filma035()
 {
@@ -11,11 +10,12 @@ action johja118_filma035::fireAtOpp(const sensors& s){
 }
 
 action johja118_filma035::doYourThing (const sensors &s) {
+    cout << s.turn << endl;
     if(s.turn == 1){
         matchNumber++;
         opponentsMovement.push_back(vector<location>());
         ownActions.push_back(vector<action>());
-        minePositions.push_back(vector<pair<location,bool> >());
+        minePositions.push_back(vector<location>());
         /*  player = 1
          *  opponent = 2
          */
@@ -29,19 +29,39 @@ action johja118_filma035::doYourThing (const sensors &s) {
     int closePowerUp = sit;
     updateInfo(s,closePowerUp);
     action move;
+    move.theMove = sit;
     if(closePowerUp != sit){
         move.theMove = moves(closePowerUp);
     }
-    if(s.turn <= 6){
+    if(mineTargets(s).size() > 0){
         move = baseMine(s);
     }
+    // TODO Fixa baseMine
+    // TODO find(minePositions[matchNumber] skiten fungerar inte riktigt!
+    // TODO Placerade inte heller några minor
+    // TODO
+    // TODO
+    // TODO
     if(false){
 
     }
     if(false){
 
+    }
+    if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),s.me) != minePositions[matchNumber].end() && move.theMove > 7){
+        for(int i = 0; i < 8; i++){
+            moves oppDir = nearestDirection(s.me,s.opp,i);
+            location target = s.me;
+            locationOffset(target,oppDir);
+            if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),s.me) != minePositions[matchNumber].end()){
+                move.theMove = oppDir;
+                break;
+            }
+        }
+        move.theMove = nearestDirection(s.me,s.opp,0);
     }
     ownActions[matchNumber].push_back(move);
+    if (move.theMove == mine) minePositions[matchNumber].push_back(s.me);
     return move;
 }
 
@@ -51,31 +71,49 @@ string johja118_filma035::taunt(const string &otherguy) const{
 
 action johja118_filma035::baseMine(const sensors &s){
     action move;
-    if (s.turn % 2 == 0){
-        move.theMove = mine;
-        minePositions[matchNumber].push_back(make_pair(s.me,true));
-        return move;
-    }
-    moves firstMineLoc = nearestDirection(s.myBase,s.oppBase,-1);
-    int moveMine = firstMineLoc;
-    // If we are not on the first turn, set moveMine to correct direction
-    if (s.turn !=1 ) moveMine += moveMine % 2 == 0 ? s.turn-1 : 4.5-s.turn/2;
-    move.theMove = moves(moveMine);
+    deque<location> targets = mineTargets(s);
+    location target = targets[0];
+    if (pow(targets[targets.size()-1].c,2) + pow(targets[targets.size()-1].r,2) < pow(targets[0].c,2) + pow(targets[0].r,2)) target = targets[targets.size()-1];
+    cout << target.c <<  ":" << target.r << endl;
+    cout << s.me.c <<  ":" << s.me.r << endl;
+    move.theMove = s.me == target ? mine : nearestDirection(s.me,target,0);
+    cout << nearestDirection(s.me,target,0) << endl;
     return move;
+}
+void johja118_filma035::locationOffset(location& loc,moves move){
+    int locationOffset[][2] = {
+        {0,-1},
+        {1,-1},
+        {1,0},
+        {1,1},
+        {0,1},
+        {-1,1},
+        {-1,0},
+        {-1,-1}
+    };
+    loc.c += locationOffset[move][0];
+    loc.r += locationOffset[move][1];
+}
+
+deque<location> johja118_filma035::mineTargets(const sensors& s){
+    deque<location> targets;
+    for(int i = -1; i < 2; i++)    {
+        location target = s.myBase;
+        locationOffset(target,nearestDirection(s.myBase,s.oppBase,i));
+        if (minePositions[matchNumber].empty() || find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),s.me) != minePositions[matchNumber].end()) targets.push_back(target);
+    }
+    return targets;
 }
 
 moves johja118_filma035::nearestDirection(const location &from,const location &to, int offset){
-    moves directions[] = {
-        moveE,moveSE,moveS,moveSW,moveW,moveNW,moveN,moveNE
-    };
-    double angle = atan2(to.r-from.r,to.c-from.c) + M_PI;
-    int index = angle / round(M_PI/4);
-    return directions[(index+offset) % 8];
+    double angle = atan2(to.r-from.r,to.c-from.c);
+    int index = round(angle / (M_PI/4));
+    return moves((index+offset+10) % 8);
 }
 
 void johja118_filma035::updateInfo(const sensors& s, int& closePowerUp){
     vector<location>& oppPos = opponentsMovement[matchNumber];
-    vector<pair<location,bool> >& minePos = minePositions[matchNumber];
+    vector<location>& minePos = minePositions[matchNumber];
     previousRoundScore = currentScore;
     currentScore = s.myScore;
     gameBoard.setPlayerLoc(s.me, 1);
@@ -91,14 +129,14 @@ void johja118_filma035::updateInfo(const sensors& s, int& closePowerUp){
         oppOnObs = true;
     }
     if((currentScore - previousRoundScore == POINTS_FOR_MINE+POINTS_FOR_HIT) || (currentScore - previousRoundScore == POINTS_FOR_MINE && (POINTS_FOR_HIT != POINTS_FOR_MINE || lastAction.theMove != fire))){
-        minePos.push_back(make_pair(s.opp,true));
+        minePos.push_back(s.opp);
     }
     if(currentScore - previousRoundScore == POINTS_FOR_MINE+POINTS_FOR_HIT){
-        minePos.push_back(make_pair(s.opp,true));
+        minePos.push_back(s.opp);
     }
 
     if (oppPos.size() > 1 && oppPos[oppPos.size()-1] == oppPos[oppPos.size()-2]){
-        minePos.push_back(make_pair(s.opp,false));
+        minePos.push_back(s.opp);
     }
 
     gameBoard.setPlayerLoc(s.me,1);
