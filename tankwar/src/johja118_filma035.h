@@ -38,6 +38,10 @@ private:
 
     action baseMine(const sensors&);
 
+    action findNearestObstacle(const sensors&);
+
+    double distance(const location&,const location&);
+
     deque<location> mineTargets(const sensors&);
 
     moves nearestDirection(const location& from,const location& to, int offset);

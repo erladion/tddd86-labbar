@@ -10,6 +10,7 @@ action johja118_filma035::fireAtOpp(const sensors& s){
 }
 
 action johja118_filma035::doYourThing (const sensors &s) {
+    gameBoard.displayBoard();
     cout << s.turn << endl;
     if(s.turn == 1){
         matchNumber++;
@@ -33,21 +34,16 @@ action johja118_filma035::doYourThing (const sensors &s) {
     if(closePowerUp != sit){
         move.theMove = moves(closePowerUp);
     }
-    if(mineTargets(s).size() > 0){
+    else if(mineTargets(s).size() > 0){
         move = baseMine(s);
     }
-    // TODO Fixa baseMine
-    // TODO find(minePositions[matchNumber] skiten fungerar inte riktigt!
-    // TODO Placerade inte heller några minor
-    // TODO
-    // TODO
-    // TODO
-    if(false){
-
+    else {
+        move = findNearestObstacle(s);
     }
     if(false){
 
     }
+
     if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),s.me) != minePositions[matchNumber].end() && move.theMove > 7){
         for(int i = 0; i < 8; i++){
             moves oppDir = nearestDirection(s.me,s.opp,i);
@@ -69,15 +65,19 @@ string johja118_filma035::taunt(const string &otherguy) const{
     return "You are really really bad, " + otherguy;
 }
 
+void printLocation(string label, location loc){
+    cout << label << "(" << loc.c << "," << loc.r << ")" << endl;
+}
+
 action johja118_filma035::baseMine(const sensors &s){
     action move;
     deque<location> targets = mineTargets(s);
     location target = targets[0];
-    if (pow(targets[targets.size()-1].c,2) + pow(targets[targets.size()-1].r,2) < pow(targets[0].c,2) + pow(targets[0].r,2)) target = targets[targets.size()-1];
-    cout << target.c <<  ":" << target.r << endl;
-    cout << s.me.c <<  ":" << s.me.r << endl;
+    if (distance(targets[targets.size()-1],s.me) < distance(targets[0],s.me)) target = targets[targets.size()-1];
+    printLocation("Target", target);
+    printLocation("me",s.me);
     move.theMove = s.me == target ? mine : nearestDirection(s.me,target,0);
-    cout << nearestDirection(s.me,target,0) << endl;
+    cout << "Direction:" << nearestDirection(s.me,target,0) << endl;
     return move;
 }
 void johja118_filma035::locationOffset(location& loc,moves move){
@@ -100,7 +100,10 @@ deque<location> johja118_filma035::mineTargets(const sensors& s){
     for(int i = -1; i < 2; i++)    {
         location target = s.myBase;
         locationOffset(target,nearestDirection(s.myBase,s.oppBase,i));
-        if (minePositions[matchNumber].empty() || find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),s.me) != minePositions[matchNumber].end()) targets.push_back(target);
+        if (gameBoard.viewSquare(target) != edge && (minePositions[matchNumber].empty() || find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),target) == minePositions[matchNumber].end())) targets.push_back(target);
+    }
+    for (int i = 0;i<targets.size();++i){
+        printLocation("Mine target" + to_string(i),targets[i]);
     }
     return targets;
 }
@@ -109,6 +112,38 @@ moves johja118_filma035::nearestDirection(const location &from,const location &t
     double angle = atan2(to.r-from.r,to.c-from.c);
     int index = round(angle / (M_PI/4));
     return moves((index+offset+10) % 8);
+}
+
+action johja118_filma035::findNearestObstacle(const sensors &s){
+    location closestLoc;
+    double closestDistance = INFINITY;
+    cout << "closestDistance" << closestDistance;
+    for (int c = 0;c<BOARD_COLS;++c){
+        for (int r = 0;r<BOARD_ROWS;++r){
+            location loc;
+            loc.c = c;
+            loc.r = r;
+            if (gameBoard.viewSquare(loc) == obs){
+                if (c*c+r*r < closestDistance*closestDistance){
+                    closestDistance = distance(loc,s.me);
+                    closestLoc = loc;
+                }
+            }
+        }
+    }
+    cout << "closestDistance" << closestDistance;
+    action move;
+    if (closestDistance != INFINITY){
+        move.theMove = nearestDirection(s.me,closestLoc,0);
+    }
+    else {
+        move.theMove = nearestDirection(s.me,s.opp,0);
+    }
+    return move;
+}
+
+double johja118_filma035::distance(const location& a,const location& b){
+    return sqrt(pow(a.c-b.c,2)+pow(b.r-b.r,2));
 }
 
 void johja118_filma035::updateInfo(const sensors& s, int& closePowerUp){
@@ -154,8 +189,8 @@ void johja118_filma035::updateInfo(const sensors& s, int& closePowerUp){
     };
     for(int i = 0; i < 9; ++i){
         location current = s.me;
-        current.r += posAroundPlayer[i][0];
-        current.c += posAroundPlayer[i][1];
+        current.c += posAroundPlayer[i][0];
+        current.r += posAroundPlayer[i][1];
         gameBoard.setObjectAt(current, s.look[i]);
         if(s.look[i] == pu_ammo || s.look[i] == pu_mines || s.look[i] == pu_points){
             closePowerUp = posAroundPlayer[i][2];
