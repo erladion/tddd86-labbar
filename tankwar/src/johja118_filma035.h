@@ -27,7 +27,10 @@ private:
     int ammoLeft;
     int minesLeft;
 
-    void locationOffset(location&, moves move);
+    bool oppOnObs;
+    bool meOnObs;
+
+    location locationOffset(location, moves);
 
     int previousRoundScore;
     int currentScore;
@@ -45,6 +48,9 @@ private:
     deque<location> mineTargets(const sensors&);
 
     moves nearestDirection(const location& from,const location& to, int offset);
+    moves randomDirection(const location& from,const location& to);
+
+    action predictiveFire();
 };
 
 #endif // JOHJA118_FILMA035_H

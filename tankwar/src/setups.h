@@ -13,7 +13,7 @@ const int TIMER_AMT = 200;          // time to wait between each move if TIMER_G
 const int MAX_TURNS = 5000;         // the maximum number of turns before highest scoring player wins
                                     // to prevent deadlocks
 
-const int GAMES_PER_MATCH = 1;      // the number of games in each match
+const int GAMES_PER_MATCH = 5;      // the number of games in each match
 const int SCORE_TO_WIN = 1000;      // the number of points you must get in order to win
 
 const int BOARD_ROWS = 52;          // size of the map

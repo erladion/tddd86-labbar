@@ -24,7 +24,7 @@ using namespace std;
  *    ORDER DOES NOT MATTER
  *************************************************/
 
-typedef garlick aplayer1;		// use typedef human1 aplayer1; for human player 1
+typedef johja118_filma035 aplayer1;		// use typedef human1 aplayer1; for human player 1
 								// otherwise   typedef your_class aplayer1; for your class
 typedef johja118_filma035 aplayer2;		// use typedef human2 aplayer2; for human player 2
 								// otherwise   typedef oppon_class aplayer2; for opponent class
