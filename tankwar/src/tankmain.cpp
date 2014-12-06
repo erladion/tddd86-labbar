@@ -16,6 +16,8 @@
 #include "player.h"			// for human players
 #include "garlick.h"
 #include "johja118_filma035.h"
+#include "test.h"
+#include "testnotrand.h"
 
 using namespace std;
 
@@ -26,7 +28,7 @@ using namespace std;
 
 typedef johja118_filma035 aplayer1;		// use typedef human1 aplayer1; for human player 1
 								// otherwise   typedef your_class aplayer1; for your class
-typedef johja118_filma035 aplayer2;		// use typedef human2 aplayer2; for human player 2
+typedef testnotrand aplayer2;		// use typedef human2 aplayer2; for human player 2
 								// otherwise   typedef oppon_class aplayer2; for opponent class
 
 /***************************************************************
@@ -72,12 +74,12 @@ int main() {
 	// begin the main game loop
     for (gameNumber = 0; gameNumber < GAMES_PER_MATCH; gameNumber++) {
 
-        startMessage(gameNumber, p1, p2);
+        //startMessage(gameNumber, p1, p2);
         game.genBoard(gameNumber);			// intialize the board and reset ammo, mines, etc.
         turnNum = 0;
         gameStatus = findWinner(p1,p2,game);	// determine a winner
-        cin.get(press_enter);
-        clearConsole();                     	// wait and then clear the screen
+        //cin.get(press_enter);
+        //clearConsole();                     	// wait and then clear the screen
         move_hold1.theMove = start;
         move_hold2.theMove = start;            // set initial move for each player
 		
@@ -93,8 +95,8 @@ int main() {
                 processMove(move_hold2, 2, game);
                 updateScore(2, game);
 			}
-            game.displayBoard(p1.getName(), p2.getName(), move_hold1, move_hold2);
-			proceed();			// either asks user to press enter, or waits for timer
+            //game.displayBoard(p1.getName(), p2.getName(), move_hold1, move_hold2);
+            //proceed();			// either asks user to press enter, or waits for timer
             if ( (turnNum < MAX_TURNS) && ((gameStatus = findWinner(p1, p2, game)) == 0) ) { // if no winner, proceed with next player
                 if (gameNumber % 2) {
                     move_hold2 = p2.doYourThing(activateSensors(2, game, turnNum));
@@ -106,13 +108,15 @@ int main() {
                     processMove(move_hold1, 1, game);
                     updateScore(1, game);
 				}
-                game.displayBoard(p1.getName(), p2.getName(), move_hold1, move_hold2);
+                //game.displayBoard(p1.getName(), p2.getName(), move_hold1, move_hold2);
                 gameStatus = findWinner(p1, p2, game);
 			}
-			proceed();			// either asks user to press enter, or waits for timer
-		} // end of while this game is still ongoing
-	} // end of a game in the match (for loop)
-    summaryStatistics(p1, p2, game);
+
+           //proceed();			// either asks user to press enter, or waits for timer
+        } // end of while this game is still ongoing
+
+        summaryStatistics(p1, p2, game);
+    } // end of a game in the match (for loop)
 	cin.get(press_enter);
 	return 0;
 }
@@ -480,10 +484,12 @@ void proceed() {
  */
 void clearConsole()
 {
+    /*
 #if defined(_WIN32) || defined(_WIN64)
         std::system("CLS");
 #else
         // assume POSIX
         std::system("clear");
 #endif
+*/
 }

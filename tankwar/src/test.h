@@ -1,5 +1,5 @@
-#ifndef JOHJA118_FILMA035_H
-#define JOHJA118_FILMA035_H
+#ifndef TEST_H
+#define TEST_H
 
 #include "ourboard.h"
 #include "Tank.h"
@@ -9,10 +9,10 @@
 #include <algorithm>
 
 
-class johja118_filma035 : public Tank{
+class test : public Tank{
 
-public:    
-    johja118_filma035();
+public:
+    test();
     action doYourThing(const sensors&) override;
     string taunt(const string&) const override;
 
@@ -30,14 +30,10 @@ private:
     bool oppOnObs;
     bool meOnObs;
 
-    location locationOffset(location, int);
+    location locationOffset(location, moves);
 
     int previousRoundScore;
     int currentScore;
-
-    int turnStill;
-
-    bool willBaseMine = true;
 
     action fireAtOpp(const sensors&) override;
 
@@ -49,8 +45,6 @@ private:
 
     action findNearestObstacle(const sensors&);
 
-    location nearestObstacleLoc(location loc);
-
     action evasion(const sensors&);
 
     double distance(const location&,const location&);
@@ -60,9 +54,7 @@ private:
     moves nearestDirection(const location& from,const location& to, int offset);
     moves randomDirection(const location& from,const location& to);
 
-    action predictiveFire(const sensors&);
-
-    bool isLeading = true;
+    action predictiveFire();
 };
 
-#endif // JOHJA118_FILMA035_H
+#endif // TEST_H

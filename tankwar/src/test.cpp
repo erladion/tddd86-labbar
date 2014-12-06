@@ -1,17 +1,16 @@
-#include "johja118_filma035.h"
+#include "test.h"
 
-johja118_filma035::johja118_filma035()
+test::test()
 {
-    name = "Dr4g0nSl4y3er";
+    name = "testBot";
 }
 
-action johja118_filma035::fireAtOpp(const sensors& s){
+action test::fireAtOpp(const sensors& s){
 
 }
 
-action johja118_filma035::doYourThing (const sensors &s) {
+action test::doYourThing (const sensors &s) {
     if(s.turn == 1){
-        turnStill = 0;
         matchNumber++;
         opponentsMovement.push_back(vector<location>());
         ownActions.push_back(vector<action>());
@@ -24,33 +23,38 @@ action johja118_filma035::doYourThing (const sensors &s) {
         gameBoard.setBaseAt(s.oppBase,2);
         previousRoundScore = s.myScore;
         currentScore = s.myScore;
-        willBaseMine = isLeading ? willBaseMine : !willBaseMine;
+
     }
+    bool willBaseMine = false;
+    int baseMineTurn[5] = {0,3,5,7,8};
+
+    for(int i = 0; i < 5; ++i){
+        if(baseMineTurn[i] == matchNumber) willBaseMine = true;
+    }
+
     int closePowerUp = sit;
     updateInfo(s,closePowerUp);
     action move;
     move.theMove = sit;
-    int shotDistance = rand() % (40-rand() % 40);
+    int shotDistance = s.myAmmo < 10 ? 15 : 30;
     if(closePowerUp != sit){
         move.theMove = moves(closePowerUp);
     }
-    else if(s.myAmmo > 0 && distance(s.me,s.opp) < shotDistance){
-        if (meOnObs ? (distance(s.me,s.opp) < (oppOnObs ? 10 : shotDistance+20)) : distance(s.me,s.opp) < (oppOnObs ? 0 : shotDistance )) {
-            move = predictiveFire(s);
-        }
-        else
-            move = findNearestObstacle(s);
+    else if(s.myAmmo > 0 && (meOnObs ? (distance(s.me,s.opp) < (oppOnObs ? 10 : shotDistance+20)) : distance(s.me,s.opp) < (oppOnObs ? 0 : shotDistance ))){
+        move = predictiveFire();
     }
-    else if(mineTargets(s).size() > 0 && willBaseMine && distance(s.me,s.myBase) < distance(s.opp,s.oppBase)){
+    //else if (distance(s.me,s.opp) && oppOnObs && !meOnObs){
+      //  move = evasion(s);
+    //}
+    else if(mineTargets(s).size() > 0 && matchNumber % 2 == 0){
         move = baseMine(s);
     }
-    else if (s.myScore < s.oppScore && s.myAmmo > 0)
-        move.theMove = randomDirection(s.me,s.opp);
-    else if (distance(s.me,s.opp) < shotDistance && oppOnObs && !meOnObs){
-        move = evasion(s);
+    else if (s.myAmmo > 0) {
+        move = findNearestObstacle(s);
     }
-    else
+    else{
         move.theMove = randomDirection(s.me,s.oppBase);
+    }
 
     if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),move.theMove > 7 ? s.me : locationOffset(s.me,move.theMove)) != minePositions[matchNumber].end()){
         bool changedDirection = false;
@@ -62,11 +66,11 @@ action johja118_filma035::doYourThing (const sensors &s) {
             moveLeft %= 8;
             moveRight %= 8;
             location targetL = s.me;
-            targetL = locationOffset(targetL,moveLeft);
+            targetL = locationOffset(targetL,moves(moveLeft));
             location targetR = s.me;
-            targetR = locationOffset(targetR,moveRight);
-            if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetL) == minePositions[matchNumber].end() && gameBoard.viewSquare(targetL) != edge){
-                if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetR) == minePositions[matchNumber].end() && gameBoard.viewSquare(targetR) != edge){
+            targetR = locationOffset(targetR,moves(moveRight));
+            if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetL) == minePositions[matchNumber].end()){
+                if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetR) == minePositions[matchNumber].end()){
                     move.theMove = moves(rand() % 2 == 0 ? moveLeft : moveRight);
                     changedDirection = true;
                     break;
@@ -77,7 +81,7 @@ action johja118_filma035::doYourThing (const sensors &s) {
                     break;
                 }
             }
-            else if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetR) == minePositions[matchNumber].end() && gameBoard.viewSquare(targetR) != edge){
+            else if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetR) == minePositions[matchNumber].end()){
                 move.theMove = moves(moveRight);
                 changedDirection = true;
                 break;
@@ -90,11 +94,11 @@ action johja118_filma035::doYourThing (const sensors &s) {
     return move;
 }
 
-string johja118_filma035::taunt(const string &otherguy) const{
+string test::taunt(const string &otherguy) const{
     return "You are really really bad, " + otherguy;
 }
 
-action johja118_filma035::evasion(const sensors &s){
+action test::evasion(const sensors &s){
     action move;
     for (int r = 0; r < BOARD_ROWS; ++r){
         for (int c = 0; c < BOARD_COLS; ++c){
@@ -113,7 +117,56 @@ action johja118_filma035::evasion(const sensors &s){
     return move;
 }
 
-action johja118_filma035::baseMine(const sensors &s){
+/*
+void test::leastSquare(vector<vector<location> > oppM, int locsToCheck){
+   *
+    *
+    * [Xt] * [X] * [abc] = [Xt] * [Y]
+    *
+    *
+    *
+    * xA/yA         xAT/yAT
+    *
+    * {0,0,0}
+    * {0,0,0}
+    * .
+    * .
+    * .
+    * {0,0,0}
+    *
+   int xA[locsToCheck][3];
+   int yA[locsToCheck][3];
+
+   int xAT[3][locsToCheck];
+   int yAT[3][locsToCheck];
+
+
+   for(int i = 0; i < locsToCheck; ++i){
+       int tempX = oppM[matchNumber][oppM[matchNumber].size()-1-i].c;
+       xA[1][tempX][pow(tempX,2)];
+       xAT[tempX^2][tempX][1];
+       int tempY = oppM[matchNumber][oppM[matchNumber].size()-1-i].r;
+       yA[1][tempY][tempY^2];
+       yAT[tempY^2][tempY][1];
+       cout << tempX << " , " << tempY << endl;
+   }
+   int product[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
+   for(int row = 0; row < 3; ++row){
+       for(int col = 0; col < 3; ++col){
+           for(int inner = 0; inner < locsToCheck; ++inner){
+               product[row][col] += xAT[row][locsToCheck] * xA[locsToCheck][row];
+           }
+       }
+   }
+   for(int i = 0; i < 3; ++i){
+       for(int j = 0; j<3; ++j){
+           cout << product[i][j] << endl;
+       }
+   }
+}
+*/
+
+action test::baseMine(const sensors &s){
     action move;
     deque<location> targets = mineTargets(s);
     location target = targets[0];
@@ -122,37 +175,12 @@ action johja118_filma035::baseMine(const sensors &s){
     return move;
 }
 
-location johja118_filma035::nearestObstacleLoc(location from){
-    location closestLoc;
-    double closestDistance = INFINITY;
-    for (int c = 0;c<BOARD_COLS;++c){
-        for (int r = 0;r<BOARD_ROWS;++r){
-            location loc;
-            loc.c = c;
-            loc.r = r;
-            if (gameBoard.viewSquare(loc) == obs){
-                if (c*c+r*r < closestDistance*closestDistance){
-                    closestDistance = distance(loc,from);
-                    closestLoc = loc;
-                }
-            }
-        }
-    }
-    if (closestDistance == INFINITY) closestLoc = from;
-    return closestLoc;
-}
-
-
- action johja118_filma035::predictiveFire(const sensors& s){
-     action a;
-     if (distance(nearestObstacleLoc(s.me),s.me) != 0 && distance(nearestObstacleLoc(s.me),s.me) < 5){
-         a.theMove = randomDirection(s.me,nearestObstacleLoc(s.me));
-         return a;
-     }
+ action test::predictiveFire(){
      location locs[3];
      for(int i = 0; i <3;++i){
          locs[i] = opponentsMovement[matchNumber][opponentsMovement[matchNumber].size()-1-i];
      }
+     action a;
      a.theMove = fire;
      if (locs[1] == locs[2] || locs[1] == locs[0]){
          if (locs[1] == locs[0] && locs[1] ==  locs[2]){
@@ -176,9 +204,7 @@ location johja118_filma035::nearestObstacleLoc(location from){
 
  }
 
-location johja118_filma035::locationOffset(location loc,int move){
-    move += 8;
-    move %= 8;
+location test::locationOffset(location loc,moves move){
     int locationOffset[][2] = {
         {0,-1},
         {1,-1},
@@ -194,38 +220,53 @@ location johja118_filma035::locationOffset(location loc,int move){
     return loc;
 }
 
-deque<location> johja118_filma035::mineTargets(const sensors& s){
+deque<location> test::mineTargets(const sensors& s){
     deque<location> targets;
     for(int i = -1; i < 2; i++)    {
         location target = s.myBase;
-        target = locationOffset(target,nearestDirection(s.myBase,s.opp,i));
-        if (s.myMines > 0 && gameBoard.viewSquare(target) != edge && (minePositions[matchNumber].empty() || find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),target) == minePositions[matchNumber].end())) targets.push_back(target);
+        target = locationOffset(target,nearestDirection(s.myBase,s.oppBase,i));
+        if (gameBoard.viewSquare(target) != edge && (minePositions[matchNumber].empty() || find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),target) == minePositions[matchNumber].end())) targets.push_back(target);
+    }
+    for (int i = 0;i<targets.size();++i){
     }
     return targets;
 }
 
-moves johja118_filma035::nearestDirection(const location &from,const location &to, int offset){
+moves test::nearestDirection(const location &from,const location &to, int offset){
     if (from == to) return sit;
     double angle = atan2(to.r-from.r,to.c-from.c);
     int index = round(angle / (M_PI/4));
     return moves((index+offset+10) % 8);
 }
 
-moves johja118_filma035::randomDirection(const location &from,const location &to){
-    if (distance(from,to) < 4) return nearestDirection(from,to,0);
+moves test::randomDirection(const location &from,const location &to){
+    if (distance(from,to) < 2) return nearestDirection(from,to,0);
     moves randDir = nearestDirection(from,to,(rand() % 3)-1);
     location loc = from;
     loc = locationOffset(loc,randDir);
     if (gameBoard.viewSquare(loc) == edge)
         return randomDirection(from,to);
-    else
-        return randDir;
+    else return randDir;
 }
 
-action johja118_filma035::findNearestObstacle(const sensors &s){    
-    location closestLoc = nearestObstacleLoc(s.me);
+action test::findNearestObstacle(const sensors &s){
+    location closestLoc;
+    double closestDistance = INFINITY;
+    for (int c = 0;c<BOARD_COLS;++c){
+        for (int r = 0;r<BOARD_ROWS;++r){
+            location loc;
+            loc.c = c;
+            loc.r = r;
+            if (gameBoard.viewSquare(loc) == obs){
+                if (c*c+r*r < closestDistance*closestDistance){
+                    closestDistance = distance(loc,s.me);
+                    closestLoc = loc;
+                }
+            }
+        }
+    }
     action move;
-    if (closestLoc != s.me){
+    if (closestDistance != INFINITY){
         move.theMove = randomDirection(s.me,closestLoc);
     }
     else {
@@ -234,26 +275,24 @@ action johja118_filma035::findNearestObstacle(const sensors &s){
     return move;
 }
 
-double johja118_filma035::distance(const location& a,const location& b){
+double test::distance(const location& a,const location& b){
     return sqrt(pow(a.c-b.c,2)+pow(a.r-b.r,2));
 }
 
-void johja118_filma035::updateInfo(const sensors& s, int& closePowerUp){
+void test::updateInfo(const sensors& s, int& closePowerUp){
     vector<location>& oppPos = opponentsMovement[matchNumber];
     vector<location>& minePos = minePositions[matchNumber];
     previousRoundScore = currentScore;
     currentScore = s.myScore;
     gameBoard.setPlayerLoc(s.me, 1);
     gameBoard.setPlayerLoc(s.opp, 2);
-    if (lastAction.theMove > 7) turnStill++;
-    else turnStill--;
 
     oppPos.push_back(s.opp);
     ammoLeft = s.myAmmo;
     minesLeft = s.myMines;
 
     oppOnObs = false;
-    if(currentScore - previousRoundScore == POINTS_FOR_OBS + (s.me == s.oppBase ? 1 : 0)){
+    if(currentScore - previousRoundScore == POINTS_FOR_OBS){
         gameBoard.setObjectAt(s.opp, obs);
         oppOnObs = true;
     }
@@ -291,5 +330,4 @@ void johja118_filma035::updateInfo(const sensors& s, int& closePowerUp){
         }
     }
     meOnObs = gameBoard.viewSquare(s.me) == obs;
-    isLeading = s.myScore > s.oppScore;
 }

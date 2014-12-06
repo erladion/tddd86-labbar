@@ -6,7 +6,11 @@ CONFIG += no_include_pwd
 
 SOURCES = $$PWD/src/*.cpp \
 
+
+
 HEADERS = $$PWD/src/*.h \
+
+
 
 
 QMAKE_CXXFLAGS += -std=c++11

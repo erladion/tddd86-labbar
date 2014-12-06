@@ -1,15 +1,15 @@
-#include "johja118_filma035.h"
+#include "testnotrand.h"
 
-johja118_filma035::johja118_filma035()
+testnotrand::testnotrand()
 {
     name = "Dr4g0nSl4y3er";
 }
 
-action johja118_filma035::fireAtOpp(const sensors& s){
+action testnotrand::fireAtOpp(const sensors& s){
 
 }
 
-action johja118_filma035::doYourThing (const sensors &s) {
+action testnotrand::doYourThing (const sensors &s) {
     if(s.turn == 1){
         turnStill = 0;
         matchNumber++;
@@ -24,13 +24,20 @@ action johja118_filma035::doYourThing (const sensors &s) {
         gameBoard.setBaseAt(s.oppBase,2);
         previousRoundScore = s.myScore;
         currentScore = s.myScore;
-        willBaseMine = isLeading ? willBaseMine : !willBaseMine;
+
     }
+    bool willBaseMine = false;
+    int baseMineTurn[5] = {0,3,5,7,8};
+
+    for(int i = 0; i < 5; ++i){
+        if(baseMineTurn[i] == matchNumber) willBaseMine = true;
+    }
+
     int closePowerUp = sit;
     updateInfo(s,closePowerUp);
     action move;
     move.theMove = sit;
-    int shotDistance = rand() % (40-rand() % 40);
+    int shotDistance = 40;
     if(closePowerUp != sit){
         move.theMove = moves(closePowerUp);
     }
@@ -62,11 +69,11 @@ action johja118_filma035::doYourThing (const sensors &s) {
             moveLeft %= 8;
             moveRight %= 8;
             location targetL = s.me;
-            targetL = locationOffset(targetL,moveLeft);
+            targetL = locationOffset(targetL,moves(moveLeft));
             location targetR = s.me;
-            targetR = locationOffset(targetR,moveRight);
-            if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetL) == minePositions[matchNumber].end() && gameBoard.viewSquare(targetL) != edge){
-                if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetR) == minePositions[matchNumber].end() && gameBoard.viewSquare(targetR) != edge){
+            targetR = locationOffset(targetR,moves(moveRight));
+            if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetL) == minePositions[matchNumber].end()){
+                if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetR) == minePositions[matchNumber].end()){
                     move.theMove = moves(rand() % 2 == 0 ? moveLeft : moveRight);
                     changedDirection = true;
                     break;
@@ -77,7 +84,7 @@ action johja118_filma035::doYourThing (const sensors &s) {
                     break;
                 }
             }
-            else if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetR) == minePositions[matchNumber].end() && gameBoard.viewSquare(targetR) != edge){
+            else if (find(minePositions[matchNumber].begin(),minePositions[matchNumber].end(),targetR) == minePositions[matchNumber].end()){
                 move.theMove = moves(moveRight);
                 changedDirection = true;
                 break;
@@ -90,11 +97,11 @@ action johja118_filma035::doYourThing (const sensors &s) {
     return move;
 }
 
-string johja118_filma035::taunt(const string &otherguy) const{
+string testnotrand::taunt(const string &otherguy) const{
     return "You are really really bad, " + otherguy;
 }
 
-action johja118_filma035::evasion(const sensors &s){
+action testnotrand::evasion(const sensors &s){
     action move;
     for (int r = 0; r < BOARD_ROWS; ++r){
         for (int c = 0; c < BOARD_COLS; ++c){
@@ -113,7 +120,7 @@ action johja118_filma035::evasion(const sensors &s){
     return move;
 }
 
-action johja118_filma035::baseMine(const sensors &s){
+action testnotrand::baseMine(const sensors &s){
     action move;
     deque<location> targets = mineTargets(s);
     location target = targets[0];
@@ -122,7 +129,7 @@ action johja118_filma035::baseMine(const sensors &s){
     return move;
 }
 
-location johja118_filma035::nearestObstacleLoc(location from){
+location testnotrand::nearestObstacleLoc(location from){
     location closestLoc;
     double closestDistance = INFINITY;
     for (int c = 0;c<BOARD_COLS;++c){
@@ -143,7 +150,7 @@ location johja118_filma035::nearestObstacleLoc(location from){
 }
 
 
- action johja118_filma035::predictiveFire(const sensors& s){
+ action testnotrand::predictiveFire(const sensors& s){
      action a;
      if (distance(nearestObstacleLoc(s.me),s.me) != 0 && distance(nearestObstacleLoc(s.me),s.me) < 5){
          a.theMove = randomDirection(s.me,nearestObstacleLoc(s.me));
@@ -176,8 +183,7 @@ location johja118_filma035::nearestObstacleLoc(location from){
 
  }
 
-location johja118_filma035::locationOffset(location loc,int move){
-    move += 8;
+location testnotrand::locationOffset(location loc,int move){
     move %= 8;
     int locationOffset[][2] = {
         {0,-1},
@@ -194,7 +200,7 @@ location johja118_filma035::locationOffset(location loc,int move){
     return loc;
 }
 
-deque<location> johja118_filma035::mineTargets(const sensors& s){
+deque<location> testnotrand::mineTargets(const sensors& s){
     deque<location> targets;
     for(int i = -1; i < 2; i++)    {
         location target = s.myBase;
@@ -204,14 +210,14 @@ deque<location> johja118_filma035::mineTargets(const sensors& s){
     return targets;
 }
 
-moves johja118_filma035::nearestDirection(const location &from,const location &to, int offset){
+moves testnotrand::nearestDirection(const location &from,const location &to, int offset){
     if (from == to) return sit;
     double angle = atan2(to.r-from.r,to.c-from.c);
     int index = round(angle / (M_PI/4));
     return moves((index+offset+10) % 8);
 }
 
-moves johja118_filma035::randomDirection(const location &from,const location &to){
+moves testnotrand::randomDirection(const location &from,const location &to){
     if (distance(from,to) < 4) return nearestDirection(from,to,0);
     moves randDir = nearestDirection(from,to,(rand() % 3)-1);
     location loc = from;
@@ -222,7 +228,7 @@ moves johja118_filma035::randomDirection(const location &from,const location &to
         return randDir;
 }
 
-action johja118_filma035::findNearestObstacle(const sensors &s){    
+action testnotrand::findNearestObstacle(const sensors &s){
     location closestLoc = nearestObstacleLoc(s.me);
     action move;
     if (closestLoc != s.me){
@@ -234,11 +240,11 @@ action johja118_filma035::findNearestObstacle(const sensors &s){
     return move;
 }
 
-double johja118_filma035::distance(const location& a,const location& b){
+double testnotrand::distance(const location& a,const location& b){
     return sqrt(pow(a.c-b.c,2)+pow(a.r-b.r,2));
 }
 
-void johja118_filma035::updateInfo(const sensors& s, int& closePowerUp){
+void testnotrand::updateInfo(const sensors& s, int& closePowerUp){
     vector<location>& oppPos = opponentsMovement[matchNumber];
     vector<location>& minePos = minePositions[matchNumber];
     previousRoundScore = currentScore;
@@ -291,5 +297,4 @@ void johja118_filma035::updateInfo(const sensors& s, int& closePowerUp){
         }
     }
     meOnObs = gameBoard.viewSquare(s.me) == obs;
-    isLeading = s.myScore > s.oppScore;
 }

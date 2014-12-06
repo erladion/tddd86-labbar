@@ -1,5 +1,5 @@
-#ifndef JOHJA118_FILMA035_H
-#define JOHJA118_FILMA035_H
+#ifndef TESTNOTRAND_H
+#define TESTNOTRAND_H
 
 #include "ourboard.h"
 #include "Tank.h"
@@ -9,10 +9,10 @@
 #include <algorithm>
 
 
-class johja118_filma035 : public Tank{
+class testnotrand : public Tank{
 
-public:    
-    johja118_filma035();
+public:
+    testnotrand();
     action doYourThing(const sensors&) override;
     string taunt(const string&) const override;
 
@@ -37,8 +37,6 @@ private:
 
     int turnStill;
 
-    bool willBaseMine = true;
-
     action fireAtOpp(const sensors&) override;
 
     void updateInfo(const sensors&,int&);
@@ -61,8 +59,6 @@ private:
     moves randomDirection(const location& from,const location& to);
 
     action predictiveFire(const sensors&);
-
-    bool isLeading = true;
 };
 
-#endif // JOHJA118_FILMA035_H
+#endif // TESTNOTRAND_H
