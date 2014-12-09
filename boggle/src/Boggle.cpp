@@ -79,17 +79,19 @@ bool Boggle::isUsedWord(string word){
 
 bool Boggle::findWord(string word){
     bool found = false;
-    cout << "4";
     for (int i = 0; i < NUM_CUBES; ++i){
         if (topSide(i/4,i%4) == word[0])
             cout << word[0];
-            if (findWord2(word,(char*)word[0],i))
+            if (findWord2(word,string(1,word[0]),i))
                 found = true;
     }
     return found;
 }
 bool Boggle::findWord2(string word, string lettersFound, int index){
-    //cout << lettersFound;
+    //TODO: PLSFIX
+    cout << lettersFound;
+    string s;
+    getline(cin,s);
     if (word == lettersFound)
         return true;
     if (lettersFound.size() == word.size())

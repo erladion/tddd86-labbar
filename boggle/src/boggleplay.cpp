@@ -16,7 +16,7 @@
  */
 void playOneGame(Boggle& boggle) {
     // TODO: implement this function (and add any other functions you like to help you)
-    if (yesOrNo("Do you want to use your own board?")){        
+    if (yesOrNo("Do you want to use your own board?")){
         string boardLayout;
         do{
             cout << "Type the 16 alphabetic characters that your board will consist of: ";
@@ -45,13 +45,13 @@ void playOneGame(Boggle& boggle) {
             continue;
         }
         cout << "1";
-        /*if (boggle.findWord(input)){
+        if (boggle.findWord(input)){
             cout << "2";
             cout << "You found a word!!!!!!!!!";
         }
         else{
             cout << "3";
-        }*/
+        }
     }
 }
 

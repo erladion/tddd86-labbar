@@ -53,7 +53,7 @@ void intro() {
     cout << endl;
     cout << "Press Enter to begin the game ... ";
     string line;
-    getline(cin, line);
+    //getline(cin, line);
 }
 
 /*
