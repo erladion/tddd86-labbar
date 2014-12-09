@@ -11,6 +11,7 @@
 #include <string>
 #include <grid.h>
 #include <lexicon.h>
+#include <set>
 // TODO: include any other header files you need
 
 using namespace std;
@@ -26,10 +27,17 @@ public:
     char topSide(int x, int y);
     void printBoard();
     // TODO: decide the public member functions and declare them
+    void setUserBoard(string);
+    bool isProperWord(string);
+    bool isRealWord(string);
+    bool isUsedWord(string);
+    bool findWord(string);
 
 private:
+    bool findWord2(string,string,int);
     Grid<string> board;
     Lexicon wordlist;
+    set<string> usedWords;
     // TODO: decide the private member variables/functions and declare them
 
 };

@@ -18,32 +18,30 @@ public:
 
 
 private:
+    // sparar det som vi vet om banan, fiendens drag, möjliga minpositioner och vårt senaste drag.
     OurBoard gameBoard;
-    vector<vector<location> > opponentsMovement;
-    vector<vector<action> > ownActions;
-    vector<vector<location > > minePositions;
+    vector<location> opponentsMovement;
+    vector<location> minePositions;
     action lastAction;
-    int matchNumber = -1;
-    int ammoLeft;
-    int minesLeft;
 
+    // oppOnObs = true om motståndaren står på ett obstacle
+    // meOnObs = true om vi står på ett obstacle
     bool oppOnObs;
     bool meOnObs;
 
-    location locationOffset(location, int);
-
+    // Förra samt nuvarande rundas poäng
     int previousRoundScore;
     int currentScore;
 
-    int turnStill;
-
+    // Sann om vi vill använda baseMine strategin den här matchen
     bool willBaseMine = true;
 
-    action fireAtOpp(const sensors&) override;
+    // Sann om vi vann senaste match, uppdateras varje runda för att vara säkra på om vi vann eller inte
+    bool isLeading = true;
+
+    location locationOffset(location, int);
 
     void updateInfo(const sensors&,int&);
-
-    void leastSquare(vector<vector<location> >, int);
 
     action baseMine(const sensors&);
 
@@ -61,8 +59,6 @@ private:
     moves randomDirection(const location& from,const location& to);
 
     action predictiveFire(const sensors&);
-
-    bool isLeading = true;
 };
 
 #endif // JOHJA118_FILMA035_H

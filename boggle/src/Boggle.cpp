@@ -20,6 +20,8 @@ static string CUBES[NUM_CUBES] = {        // the letters on all 6 sides of every
    "EIOSST", "ELRTTY", "HIMNQU", "HLNNRZ"
 };
 
+
+
 Boggle::Boggle(){
     board = Grid<string>(4,4);
     for(int x = 0; x < 4; x++){
@@ -50,6 +52,67 @@ void Boggle::printBoard(){
         }
         cout << endl;
     }
+}
+
+void Boggle::setUserBoard(string userString){
+    for (int i = 0; i < userString.size(); ++i){
+        board[i/4][i%4] = string(1,userString[i]);
+    }
+}
+
+bool Boggle::isProperWord(string word){    
+    for (int i = 0; i < word.size(); ++i){
+        if (!isalpha(word[i])){
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Boggle::isRealWord(string word){
+    return wordlist.contains(word);
+}
+
+bool Boggle::isUsedWord(string word){
+    return usedWords.find(word) != usedWords.end();
+}
+
+bool Boggle::findWord(string word){
+    bool found = false;
+    cout << "4";
+    for (int i = 0; i < NUM_CUBES; ++i){
+        if (topSide(i/4,i%4) == word[0])
+            cout << word[0];
+            if (findWord2(word,(char*)word[0],i))
+                found = true;
+    }
+    return found;
+}
+bool Boggle::findWord2(string word, string lettersFound, int index){
+    //cout << lettersFound;
+    if (word == lettersFound)
+        return true;
+    if (lettersFound.size() == word.size())
+        return false;
+    int positions[8][2] = {
+        {0,-1},
+        {1,-1},
+        {1,0},
+        {1,1},
+        {0,1},
+        {-1,1},
+        {-1,0},
+        {-1,-1}
+    };
+    bool found = false;
+    for (int i = 0; i < 8; ++i){
+        int x = index/4+positions[i][0];
+        int y = index%4+positions[i][1];
+        if (x > 0 && x < BOARD_SIZE && y > 0 && y < BOARD_SIZE)
+            if (findWord2(word,lettersFound+topSide(x,y),x*4+y))
+                found = true;
+    }
+    return found;
 }
 
 // TODO: implement the members you declared in Boggle.h
