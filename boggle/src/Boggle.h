@@ -12,6 +12,7 @@
 #include <grid.h>
 #include <lexicon.h>
 #include <set>
+#include <vector>
 // TODO: include any other header files you need
 
 using namespace std;
@@ -32,12 +33,22 @@ public:
     bool isRealWord(string);
     bool isUsedWord(string);
     bool findWord(string);
-
+    void findAllWords();
+    void useWord(string);
+    void printWords(bool);
+    void addPoints(string, bool);
+    void printPoints(bool);
+    void resetGame();
+    void printWinMessage();
 private:
-    bool findWord2(string,string,int);
+    bool findWord2(string,string,vector<int>);
+    void findAllWords2(string,vector<int>);
     Grid<string> board;
     Lexicon wordlist;
     set<string> usedWords;
+    int points = 0;
+    set<string> cWords;
+    int cPoints = 0;
     // TODO: decide the private member variables/functions and declare them
 
 };

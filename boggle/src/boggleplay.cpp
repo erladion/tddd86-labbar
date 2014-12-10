@@ -11,12 +11,15 @@
 #include "strlib.h"
 // TODO: include any other header files you need
 
+
+bool debug = false;
+
 /*
  * Plays one game of Boggle using the given boggle game state object.
  */
 void playOneGame(Boggle& boggle) {
-    // TODO: implement this function (and add any other functions you like to help you)
-    if (yesOrNo("Do you want to use your own board?")){
+    boggle.resetGame();
+    if (!debug && yesOrNo("Do you want to use your own board? ")){
         string boardLayout;
         do{
             cout << "Type the 16 alphabetic characters that your board will consist of: ";
@@ -27,32 +30,46 @@ void playOneGame(Boggle& boggle) {
     else{
         boggle.shuffleBoard();
     }
-    boggle.printBoard();
     string input;
-    while (getline(cin,input)){
+    while (true){
+        boggle.printBoard();
+        boggle.printWords(true);
+        boggle.printPoints(true);
+        bool goodWord;
+        do {
+            cout << "Guess a word: ";
+            if (!debug) getline(cin,input);
+            else input = "horse";
+            goodWord = false;
+            if (input == "")
+                break;
+            if (!boggle.isRealWord(input)){
+                cout << "That is not a real word!" << endl;
+            }
+            else if (input.size() < 4){
+                cout << "That word is too short!" << endl;
+            }
+            else if (boggle.isUsedWord(input)){
+                cout << "You have already used that word!" << endl;
+            }
+            else if (boggle.findWord(input)){
+                cout << "You found a word!" << endl;
+                boggle.useWord(input);
+                boggle.addPoints(input,true);
+                goodWord = true;
+            }
+            else
+                cout << "That word can't be made on the board." << endl;
+        }
+        while (!goodWord);
         if (input == "")
             break;
-        if (!boggle.isRealWord(input)){
-            cout << "That is not a real word!" << endl;
-            continue;
-        }
-        if (input.size() < 4){
-            cout << "That word is too short!" << endl;
-            continue;
-        }
-        if (boggle.isUsedWord(input)){
-            cout << "You have already used that word!" << endl;
-            continue;
-        }
-        cout << "1";
-        if (boggle.findWord(input)){
-            cout << "2";
-            cout << "You found a word!!!!!!!!!";
-        }
-        else{
-            cout << "3";
-        }
+        clearConsole();
     }
+    boggle.findAllWords();
+    boggle.printWords(false);
+    boggle.printPoints(false);
+    boggle.printWinMessage();
 }
 
 /*

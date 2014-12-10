@@ -10,15 +10,16 @@
 #include "shuffle.h"
 #include "strlib.h"
 #include <iostream>
+#include <algorithm>
 
 static const int NUM_CUBES = 16;   // the number of cubes in the game
 static const int CUBE_SIDES = 6;   // the number of sides on each cube
 static string CUBES[NUM_CUBES] = {        // the letters on all 6 sides of every cube
-   "AAEEGN", "ABBJOO", "ACHOPS", "AFFKPS",
-   "AOOTTW", "CIMOTU", "DEILRX", "DELRVY",
-   "DISTTY", "EEGHNW", "EEINSU", "EHRTVW",
-   "EIOSST", "ELRTTY", "HIMNQU", "HLNNRZ"
-};
+                                          "AAEEGN", "ABBJOO", "ACHOPS", "AFFKPS",
+                                          "AOOTTW", "CIMOTU", "DEILRX", "DELRVY",
+                                          "DISTTY", "EEGHNW", "EEINSU", "EHRTVW",
+                                          "EIOSST", "ELRTTY", "HIMNQU", "HLNNRZ"
+                                 };
 
 
 
@@ -34,6 +35,13 @@ Boggle::Boggle(){
 
 char Boggle::topSide(int x,int y){
     return board[x][y][0];
+}
+
+void Boggle::resetGame(){
+    points = 0;
+    usedWords.clear();
+    cPoints = 0;
+    cWords.clear();
 }
 
 void Boggle::shuffleBoard(){
@@ -55,6 +63,7 @@ void Boggle::printBoard(){
 }
 
 void Boggle::setUserBoard(string userString){
+    transform(userString.begin(),userString.end(),userString.begin(),::toupper);
     for (int i = 0; i < userString.size(); ++i){
         board[i/4][i%4] = string(1,userString[i]);
     }
@@ -77,21 +86,61 @@ bool Boggle::isUsedWord(string word){
     return usedWords.find(word) != usedWords.end();
 }
 
+void Boggle::useWord(string word){
+    usedWords.insert(word);
+}
+
+void Boggle::printPoints(bool humanPlayer){
+    cout << "Points: " << (humanPlayer ? points : cPoints) << endl;
+}
+
+void Boggle::addPoints(string word, bool humanPlayer){
+    (humanPlayer ? points : cPoints) += word.size()-3;
+}
+
+void Boggle::printWinMessage(){
+    if (points >= cPoints){
+        cout << "You are strong, human. You win this time, but I will be back...";
+    }
+    else {
+        cout << "Hahaha! I win again, puny human! Get rekt son!";
+    }
+}
+
+void Boggle::printWords(bool humanPlayer){
+    set<string>& wordSet = humanPlayer ? usedWords : cWords;
+    cout << "Found words: {";
+    for (auto it = wordSet.begin(); it != wordSet.end(); it++){
+        if (it != wordSet.begin())
+            cout << ", \"" << *it << "\"";
+        else
+            cout << "\"" << *it << "\"" ;
+    }
+    cout << "}" << endl;
+}
+
 bool Boggle::findWord(string word){
+    transform(word.begin(),word.end(),word.begin(),::toupper);
     bool found = false;
+    vector<int> indexList;
     for (int i = 0; i < NUM_CUBES; ++i){
-        if (topSide(i/4,i%4) == word[0])
-            cout << word[0];
-            if (findWord2(word,string(1,word[0]),i))
+        if (topSide(i/4,i%4) == word[0]){
+            indexList.push_back(i);
+            if (findWord2(word,string(1,word[0]),indexList)) {
                 found = true;
+                break;
+            }
+            indexList.pop_back();
+        }
     }
     return found;
 }
-bool Boggle::findWord2(string word, string lettersFound, int index){
-    //TODO: PLSFIX
-    cout << lettersFound;
+bool Boggle::findWord2(string word, string lettersFound, vector<int> indexList){
+    /*cout << lettersFound << endl << " on index: " << indexList[indexList.size()-1];
+
     string s;
-    getline(cin,s);
+    getline(cin,s);*/
+    int currentIndex = indexList[indexList.size()-1];
     if (word == lettersFound)
         return true;
     if (lettersFound.size() == word.size())
@@ -108,13 +157,62 @@ bool Boggle::findWord2(string word, string lettersFound, int index){
     };
     bool found = false;
     for (int i = 0; i < 8; ++i){
-        int x = index/4+positions[i][0];
-        int y = index%4+positions[i][1];
-        if (x > 0 && x < BOARD_SIZE && y > 0 && y < BOARD_SIZE)
-            if (findWord2(word,lettersFound+topSide(x,y),x*4+y))
-                found = true;
+        int x = currentIndex/4+positions[i][0];
+        int y = currentIndex%4+positions[i][1];
+        if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE){
+            if (find(indexList.begin(),indexList.end(),x*4+y) == indexList.end()){
+                indexList.push_back(x*4+y);
+                if (word[lettersFound.size()] == topSide(x,y) && findWord2(word,lettersFound+topSide(x,y),indexList)){
+                    found = true;
+                    break;
+                }
+                indexList.pop_back();
+            }
+        }
     }
     return found;
+}
+
+void Boggle::findAllWords(){
+    vector<int> indexList;
+    for (int i = 0; i < NUM_CUBES; ++i){
+        indexList.push_back(i);
+        findAllWords2(string(1,topSide(i/4,i%4)),indexList);
+        indexList.pop_back();
+    }
+    for (auto it = cWords.begin(); it != cWords.end();++it){
+        addPoints(*it,false);
+    }
+}
+
+void Boggle::findAllWords2(string word, vector<int> indexList){
+    int currentIndex = indexList[indexList.size()-1];
+    if (word.size() > 3 && wordlist.contains(word)){
+        cWords.insert(word);
+    }
+    if (!wordlist.containsPrefix(word))
+        return;
+    int positions[8][2] = {
+        {0,-1},
+        {1,-1},
+        {1,0},
+        {1,1},
+        {0,1},
+        {-1,1},
+        {-1,0},
+        {-1,-1}
+    };
+    for (int i = 0; i < 8; ++i){
+        int x = currentIndex/4+positions[i][0];
+        int y = currentIndex%4+positions[i][1];
+        if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE){
+            if (find(indexList.begin(),indexList.end(),x*4+y) == indexList.end()){
+                indexList.push_back(x*4+y);
+                findAllWords2(word+topSide(x,y),indexList);
+                indexList.pop_back();
+            }
+        }
+    }
 }
 
 // TODO: implement the members you declared in Boggle.h
