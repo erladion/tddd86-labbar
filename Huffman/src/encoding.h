@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <queue>
 #include "bitstream.h"
 #include "HuffmanNode.h"
 using namespace std;

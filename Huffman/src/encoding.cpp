@@ -6,15 +6,46 @@
 #include "encoding.h"
 // TODO: include any other headers you need
 
+using namespace std;
+
 map<int, int> buildFrequencyTable(istream& input) {
-    // TODO: implement this function
     map<int, int> freqTable;
+    // As long as we are not at the end of the file, read 1 byte and check if it's already in the map
+    // if so, increment it's value by 1, else add it to the map and set the value to 1
+    while(true){
+        int inputByte = input.get();
+        if(inputByte == -1){
+            freqTable.insert(make_pair(inputByte, 1));
+            break;
+        }
+        if(freqTable.find(inputByte) != freqTable.end()){
+            freqTable[inputByte]++;
+        }
+        else{
+            freqTable.insert(make_pair(inputByte, 1));
+        }
+    };
     return freqTable;
 }
 
 HuffmanNode* buildEncodingTree(const map<int, int> &freqTable) {
-    // TODO: implement this function
-    return nullptr;
+    priority_queue<HuffmanNode> prioQ;
+    for (auto it = freqTable.begin(); it != freqTable.end();it++){
+        HuffmanNode node(it->first,it->second);
+        prioQ.push(node);
+    }
+    while (prioQ.size() > 1){
+        HuffmanNode n1 = prioQ.top();
+        HuffmanNode* p1 = &n1;
+        prioQ.pop();
+        HuffmanNode n2 = prioQ.top();
+        HuffmanNode* p2 = &n2;
+        prioQ.pop();
+        HuffmanNode n3(NOT_A_CHAR,p1->count+p2->count,p1,p2);
+        prioQ.push(n3);
+    }
+    HuffmanNode node = prioQ.top();
+    return &node;
 }
 
 map<int, string> buildEncodingMap(HuffmanNode* encodingTree) {
