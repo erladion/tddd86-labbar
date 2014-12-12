@@ -22,28 +22,40 @@ static string CUBES[NUM_CUBES] = {        // the letters on all 6 sides of every
                                  };
 
 
+/*
+ * Creates an empty board and reads the wordlist
+ */
+Boggle::Boggle(){    
+    resetGame();
+    wordlist = Lexicon("EnglishWords.dat");
+}
 
-Boggle::Boggle(){
+/*
+ * Returns the Letter on top of the die at x,y
+ */
+char Boggle::topSide(int x,int y){
+    return board[x][y][0];
+}
+
+/*
+ * Resets points and found words for both players
+ */
+void Boggle::resetGame(){
+    points = 0;
+    usedWords.clear();
+    cPoints = 0;
+    cWords.clear();
     board = Grid<string>(4,4);
     for(int x = 0; x < 4; x++){
         for(int y = 0; y < 4; y++){
             board[x][y] = CUBES[y*4+x];
         }
     }
-    wordlist = Lexicon("EnglishWords.dat");
 }
 
-char Boggle::topSide(int x,int y){
-    return board[x][y][0];
-}
-
-void Boggle::resetGame(){
-    points = 0;
-    usedWords.clear();
-    cPoints = 0;
-    cWords.clear();
-}
-
+/*
+ * Shuffles the dice and the dice positions
+ */
 void Boggle::shuffleBoard(){
     shuffle(board);
     for (int i = 0;i<NUM_CUBES;i++){
@@ -53,6 +65,9 @@ void Boggle::shuffleBoard(){
     }
 }
 
+/*
+ * Prints the board
+ */
 void Boggle::printBoard(){
     for (int x = 0; x < 4;x++){
         for (int y = 0; y < 4;y++){
@@ -62,6 +77,9 @@ void Boggle::printBoard(){
     }
 }
 
+/*
+ * Sets the board to be the letters in 'userString'
+ */
 void Boggle::setUserBoard(string userString){
     transform(userString.begin(),userString.end(),userString.begin(),::toupper);
     for (int i = 0; i < userString.size(); ++i){
@@ -69,6 +87,9 @@ void Boggle::setUserBoard(string userString){
     }
 }
 
+/*
+ * Checks if a word contains only letters
+ */
 bool Boggle::isProperWord(string word){    
     for (int i = 0; i < word.size(); ++i){
         if (!isalpha(word[i])){
@@ -78,26 +99,46 @@ bool Boggle::isProperWord(string word){
     return true;
 }
 
+/*
+ * Checks if a word exists in the wordlist
+ */
 bool Boggle::isRealWord(string word){
     return wordlist.contains(word);
 }
 
+/*
+ * Checks if the word has already been used
+ */
 bool Boggle::isUsedWord(string word){
     return usedWords.find(word) != usedWords.end();
 }
 
+/*
+ * Add the word in the human player's list of found words
+ */
 void Boggle::useWord(string word){
     usedWords.insert(word);
 }
 
+/*
+ * Print one of the player's points.
+ * if humanPlayer == true, prints human player's points, otherwise computer's points.
+ */
 void Boggle::printPoints(bool humanPlayer){
     cout << "Points: " << (humanPlayer ? points : cPoints) << endl;
 }
 
+/*
+ * Add the points for the word 'word' to one of the player's score
+ * 'humanPlayer' decides if the human or computer player gets the points
+ */
 void Boggle::addPoints(string word, bool humanPlayer){
     (humanPlayer ? points : cPoints) += word.size()-3;
 }
 
+/*
+ * prints a win/loss message depending on who has the most points.
+ */
 void Boggle::printWinMessage(){
     if (points >= cPoints){
         cout << "You are strong, human. You win this time, but I will be back...";
@@ -107,6 +148,10 @@ void Boggle::printWinMessage(){
     }
 }
 
+/*
+ * Prints all the words that a player has found.
+ * 'humanPlayer' decides if the human or computer player's get his words printed
+ */
 void Boggle::printWords(bool humanPlayer){
     set<string>& wordSet = humanPlayer ? usedWords : cWords;
     cout << "Found words: {";
@@ -119,6 +164,9 @@ void Boggle::printWords(bool humanPlayer){
     cout << "}" << endl;
 }
 
+/*
+ * Checks if a word exists on the board
+ */
 bool Boggle::findWord(string word){
     transform(word.begin(),word.end(),word.begin(),::toupper);
     bool found = false;
@@ -135,33 +183,27 @@ bool Boggle::findWord(string word){
     }
     return found;
 }
-bool Boggle::findWord2(string word, string lettersFound, vector<int> indexList){
-    /*cout << lettersFound << endl << " on index: " << indexList[indexList.size()-1];
 
-    string s;
-    getline(cin,s);*/
+/*
+ * Recursive help function for findWord
+ */
+bool Boggle::findWord2(string word, string lettersFound, vector<int> indexList){
     int currentIndex = indexList[indexList.size()-1];
     if (word == lettersFound)
         return true;
     if (lettersFound.size() == word.size())
         return false;
-    int positions[8][2] = {
-        {0,-1},
-        {1,-1},
-        {1,0},
-        {1,1},
-        {0,1},
-        {-1,1},
-        {-1,0},
-        {-1,-1}
-    };
+
     bool found = false;
+    // Checks all letters around the current index
     for (int i = 0; i < 8; ++i){
         int x = currentIndex/4+positions[i][0];
         int y = currentIndex%4+positions[i][1];
         if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE){
+            // Makes sure we haven't been on this letter before
             if (find(indexList.begin(),indexList.end(),x*4+y) == indexList.end()){
                 indexList.push_back(x*4+y);
+                // Checks so that it is the correct letter and then calls itself to keep looking
                 if (word[lettersFound.size()] == topSide(x,y) && findWord2(word,lettersFound+topSide(x,y),indexList)){
                     found = true;
                     break;
@@ -173,6 +215,9 @@ bool Boggle::findWord2(string word, string lettersFound, vector<int> indexList){
     return found;
 }
 
+/*
+ * Find all the words that can be made on the board and gives the computer points for all of them.
+ */
 void Boggle::findAllWords(){
     vector<int> indexList;
     for (int i = 0; i < NUM_CUBES; ++i){
@@ -185,6 +230,9 @@ void Boggle::findAllWords(){
     }
 }
 
+/*
+ * Recursive help function for findAllWords
+ */
 void Boggle::findAllWords2(string word, vector<int> indexList){
     int currentIndex = indexList[indexList.size()-1];
     if (word.size() > 3 && wordlist.contains(word)){
@@ -192,22 +240,15 @@ void Boggle::findAllWords2(string word, vector<int> indexList){
     }
     if (!wordlist.containsPrefix(word))
         return;
-    int positions[8][2] = {
-        {0,-1},
-        {1,-1},
-        {1,0},
-        {1,1},
-        {0,1},
-        {-1,1},
-        {-1,0},
-        {-1,-1}
-    };
+    // Checks all letters around the current index
     for (int i = 0; i < 8; ++i){
         int x = currentIndex/4+positions[i][0];
         int y = currentIndex%4+positions[i][1];
         if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE){
+            // Makes sure we haven't been on this letter before
             if (find(indexList.begin(),indexList.end(),x*4+y) == indexList.end()){
                 indexList.push_back(x*4+y);
+                // Calls itself to keep looking for words
                 findAllWords2(word+topSide(x,y),indexList);
                 indexList.pop_back();
             }

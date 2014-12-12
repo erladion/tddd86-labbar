@@ -27,7 +27,6 @@ public:
     void shuffleBoard();
     char topSide(int x, int y);
     void printBoard();
-    // TODO: decide the public member functions and declare them
     void setUserBoard(string);
     bool isProperWord(string);
     bool isRealWord(string);
@@ -40,16 +39,34 @@ public:
     void printPoints(bool);
     void resetGame();
     void printWinMessage();
+
 private:
     bool findWord2(string,string,vector<int>);
     void findAllWords2(string,vector<int>);
+    // The gameboard
     Grid<string> board;
+    // The list of all english words
     Lexicon wordlist;
+    // all words that the human player have found
     set<string> usedWords;
+    // the human player's points
     int points = 0;
+    // all words that the computer player have found
     set<string> cWords;
+    // the computer player's points
     int cPoints = 0;
-    // TODO: decide the private member variables/functions and declare them
+
+    // an array that helps us find the position near our current position (used in findWord and findAllWords)
+    int positions[8][2] = {
+        {0,-1},
+        {1,-1},
+        {1,0},
+        {1,1},
+        {0,1},
+        {-1,1},
+        {-1,0},
+        {-1,-1}
+    };
 
 };
 

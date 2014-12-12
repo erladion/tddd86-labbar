@@ -464,8 +464,8 @@ istream* openStringOrFileInputStream(string& data, bool& isFile, bool isBits) {
             break;
         } else if (startsWith(choice, 'f')) {
             isFile = true;
-            data = "ababcab.txt";
-            //data = promptForExistingFileName("File name to process: ");
+            //data = "ababcab.txt";
+            data = promptForExistingFileName("File name to process: ");
             break;
         }
     }

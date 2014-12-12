@@ -38,8 +38,7 @@ void playOneGame(Boggle& boggle) {
         bool goodWord;
         do {
             cout << "Guess a word: ";
-            if (!debug) getline(cin,input);
-            else input = "horse";
+            getline(cin,input);
             goodWord = false;
             if (input == "")
                 break;
@@ -66,6 +65,7 @@ void playOneGame(Boggle& boggle) {
             break;
         clearConsole();
     }
+    cout << "My turn, human." << endl;
     boggle.findAllWords();
     boggle.printWords(false);
     boggle.printPoints(false);
