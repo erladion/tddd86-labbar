@@ -32,5 +32,7 @@ Brute: O(N⁴) Det finns 4 st nästlade for-loopar och allas längd är beroende
 Första loopen körs ca N ggr. Andra loopen körs N/2 ggr. 3:e = N/4. 4:e = N/8.
 Totalt = N*N/2*N/4*N/8=1/64*N⁴. Så O(N⁴)
 
-Sortering: O(N²) Först en for-loop som går N ggr. Sedan en for-loop som går från i till N, och sedan en till som går lika långt. De inre for-looparna går då N/2.
-Totalt = N*(N/2+N/2)=N². Så O(N²)
+Sortering: O(N²) Först en for-loop som går N ggr. Sedan en for-loop som går från i till N, och en sortering som går i N log N och sedan en till for-loop som går lika långt som den första inre for-loopen. De inre for-looparna går då N/2.
+Totalt = N*(N/2 + N log N + N/2) =>
+=> N*(N + N log N) =>
+=> N² + N² log N => N² log N. Så O(N² log N)
