@@ -23,18 +23,18 @@ using namespace std;
  * flags on.
  */
 #define BasicKDTreeTestEnabled          1 // Step one checks
-#define ModerateKDTreeTestEnabled       0
-#define HarderKDTreeTestEnabled         0
-#define EdgeCaseKDTreeTestEnabled       0
-#define MutatingKDTreeTestEnabled       0
-#define ThrowingKDTreeTestEnabled       0
-#define ConstKDTreeTestEnabled          0
+#define ModerateKDTreeTestEnabled       1
+#define HarderKDTreeTestEnabled         1
+#define EdgeCaseKDTreeTestEnabled       1
+#define MutatingKDTreeTestEnabled       1
+#define ThrowingKDTreeTestEnabled       1
+#define ConstKDTreeTestEnabled          1
 
-#define NearestNeighborTestEnabled      0 // Step two checks
-#define MoreNearestNeighborTestEnabled  0
+#define NearestNeighborTestEnabled      1 // Step two checks
+#define MoreNearestNeighborTestEnabled  1
 
-#define BasicCopyTestEnabled            0 // Step three checks
-#define ModerateCopyTestEnabled         0
+#define BasicCopyTestEnabled            1 // Step three checks
+#define ModerateCopyTestEnabled         1
 
 /* A utility function to construct a Point from a range of iterators. */
 template <size_t N, typename IteratorType>
@@ -76,7 +76,7 @@ Point<4> makePoint(double x, double y, double z, double w) {
 void pressEnterToContinue() {
   /* Use getline to stall until receiving input. */
   string line;
-  getline(cin, line);
+  //getline(cin, line);
 }
 
 /* This function is what the test suite uses to ensure that the KDTree works
@@ -361,8 +361,10 @@ void mutatingKDTreeTest() try {
     kd[pointFromRange<3>(dataPoints[i], dataPoints[i] + 3)] = 0;
 
   /* Check that the keys are right. */
-  for (size_t i = 1; i < 8; i += 2)
-    checkCondition(kd[pointFromRange<3>(dataPoints[i], dataPoints[i] + 3)] == i, "Keys are correct for odd elements.");
+  for (size_t i = 1; i < 8; i += 2){
+      size_t t = kd[pointFromRange<3>(dataPoints[i], dataPoints[i] + 3)];
+      checkCondition(t == i, "Keys are correct for odd elements.");
+  }
 
   /* Check that the keys are right. */
   for (size_t i = 0; i < 8; i += 2)
